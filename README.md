@@ -1,4 +1,3 @@
-Welcome to the Machine-Learning wiki!
 
 `K_means Result`
 
