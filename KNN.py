@@ -1,26 +1,36 @@
-import cv2 as cv
+import cv2
 import numpy as np
 import matplotlib.pyplot as plt
 
-trainData = np.random.randint(0,1000,(10000,2))
+# Feature set containing (x,y) values of 100 known/training data
+trainData = np.random.randint(0,1000,(100,2)).astype(np.float32)
 
-# Define criteria = ( type, max_iter = 10 , epsilon = 1.0 )
-criteria = (cv.TERM_CRITERIA_EPS + cv.TERM_CRITERIA_MAX_ITER, 10, 1.0)
-# Set flags (Just to avoid line break in the code)
-flags = cv.KMEANS_RANDOM_CENTERS
-# Apply KMeans
-ret,label,center = cv.kmeans(trainData.astype("float32"),4,None,criteria,10,flags)
+# Labels each one either A,B,C,D with numbers 0 to 3
+responses = np.random.randint(0,4,(100,1)).astype(np.float32)
 
-A = trainData[label.ravel()== 0]
-B = trainData[label.ravel()== 1]
-C = trainData[label.ravel()== 2]
-D = trainData[label.ravel()== 3]
-
-print(trainData)
+# Take A families and plot them
+A = trainData[responses.ravel()==0]
 plt.scatter(A[:,0],A[:,1],20,'r','^')
-plt.scatter(B[:,0],B[:,1],20,'b','o')
-plt.scatter(C[:,0],C[:,1],20,'g','.')
-plt.scatter(D[:,0],D[:,1],20,'k','x')
 
-plt.scatter(center[:,0],center[:,1],s = 80,c = 'y', marker = 's')
+# Take B families and plot them
+B = trainData[responses.ravel()==1]
+plt.scatter(B[:,0],B[:,1],20,'b','s')
+# Take C families and plot them
+C = trainData[responses.ravel()==2]
+plt.scatter(C[:,0],C[:,1],20,'k','*')
+# Take D families and plot them
+D = trainData[responses.ravel()==3]
+plt.scatter(D[:,0],D[:,1],20,'y','8')
+#Make the New data to predict by KNN
+newcomer = np.random.randint(0,1000,(10,2)).astype(np.float32)
+plt.scatter(newcomer[:,0],newcomer[:,1],20,'g','o')
+
+knn = cv2.ml.KNearest_create()
+knn.train(trainData,cv2.ml.ROW_SAMPLE,responses)
+ret, results, neighbours ,dist = knn.findNearest(newcomer, 5)
+
+print ("result: \n", results,"\n")
+print ("neighbours: \n", neighbours,"\n")
+print ("distance: \n", dist.astype("uint8"))
+
 plt.show()
